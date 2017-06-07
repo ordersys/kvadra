@@ -1,0 +1,190 @@
+{% load staticfiles sekizai_tags %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head lang="ru">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}{% endblock %}</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    {% addtoblock 'css' %}
+        <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+    {% endaddtoblock %}
+    {% addtoblock 'css' %}
+        <link rel="stylesheet" href="{% static "css/custom.css" %}">
+    {% endaddtoblock %}
+
+    {% render_block 'css' %}
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    {% addtoblock 'js' %}
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+    {% endaddtoblock %}
+    {% addtoblock 'js' %}
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    {% endaddtoblock %}
+    {% addtoblock 'js' %}
+        <script src="{% static 'js/custom.js' %}"></script>
+    {% endaddtoblock %}
+</head>
+
+<body>
+<div class="container">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="collapsed navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-9" aria-expanded="false"><span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span></button>
+            <a href="{% url 'index' %}" class="navbar-brand">КВАДРА</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-9"></div>
+    </div>
+
+    <div class="row">
+        <h1>Сиписок объектов</h1>
+        <button class="btn btn-primary btn-lg create-item-button">Добавить объект</button>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Текст</th>
+                <th>изменить</th>
+                <th>удалить</th>
+            </tr>
+        </thead>
+        <tbody class="content-wrapper">
+
+        </tbody >
+
+    </table>
+
+    <div class="modal fade create-item" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Создание объекта</h4>
+                </div>
+                <div class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade update-item" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Редактирование объекта</h4>
+                </div>
+                <div class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade delete-item" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Удаление объекта</h4>
+                </div>
+                <div class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var itemsListURL = "{% url 'api:texts' %}";
+</script>
+
+<script type="text/html" id="list_item_tmpl">
+    <tr id="item_<%=id%>" data-id="<%=id%>" class="item">
+        <td><%=id%></td>
+        <td><%=text%></td>
+        <td class="update">
+            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+        </td>
+        <td class="delete">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        </td>
+    </tr>
+</script>
+
+<script type="text/html" id="item_create_tmpl">
+    <form id="create-item-form" action="{% url 'api:texts' %}" class="item-скуфеу">
+        <div class="form-group">
+            <label for="input-form">Текст</label>
+            <input type="text" name="text" id="input-form" value="" class="form-control">
+        </div>
+        <button type="reset" class="btn btn-danger" data-dismiss="modal">Отменить</button>
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </form>
+</script>
+
+<script type="text/html" id="item_update_tmpl">
+    <form id="update-item-form-<%=id%>" action="<%=url%>" class="item-update">
+        <div class="form-group">
+            <label for="input-form-<%=id%>">Текст</label>
+            <input type="text" name="text" id="input-form-<%=id%>" value="<%=text%>" class="form-control">
+        </div>
+        <button type="reset" class="btn btn-danger" data-dismiss="modal">Отменить</button>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+</script>
+
+<script type="text/html" id="item_delete_tmpl">
+    <form id="update-item-form-<%=id%>" action="<%=url%>" class="item-delete">
+        <p>Вы действительно хотите удалить этот объект?</p>
+        <button type="reset" class="btn btn-primary" data-dismiss="modal">Отменить</button>
+        <button type="submit" class="btn btn-danger">Удалить</button>
+    </form>
+</script>
+
+{% render_block 'js' %}
+
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    function csrfSafeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
